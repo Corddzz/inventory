@@ -1,118 +1,110 @@
 import {
   getAllItems,
   getItemById,
-  addItem,
+  createItem,
   updateItem,
   deleteItem,
-} from '../models/inventoryModel.js'
+} from '../models/inventoryModel.js';
 
 export const fetchAll = async (req, res) => {
   try {
-    const data = await getAllItems()
-    res.status(200).json(data)
+    const items = await getAllItems();
+    res.status(200).json(items);
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: 'Server error', error: error.message })
+    console.error('Fetch all error:', error.message);
+    res.status(500).json({ error: 'Server error' });
   }
-}
+};
 
 export const fetchById = async (req, res) => {
-  const { id } = req.params
-
-  if (isNaN(id)) {
-    return res.status(400).json({ message: 'Invalid ID' })
-  }
-
   try {
-    const data = await getItemById(Number(id))
+    const { id } = req.params;
+    const item = await getItemById(id);
 
-    if (!data[0]) {
-      return res.status(404).json({ message: 'Item not found' })
+    if (!item || item.length === 0) {
+      return res.status(404).json({ message: 'Item not found!' });
     }
 
-    res.status(200).json(data[0])
+    res.status(200).json(item);
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: 'Server error', error: error.message })
+    console.error('Fetch by ID error:', error.message);
+    res.status(500).json({ error: 'Server Error' });
   }
-}
+};
 
-export const insertInventory = async (req, res) => {
-  const { ITEM_NAME, CATEGORY, BRAND, QUANTITY } = req.body
-
+export const insert = async (req, res) => {
   try {
-    if (!ITEM_NAME || !CATEGORY || !BRAND || !QUANTITY) {
-      return res.status(400).json({ message: 'All fields are required.' })
+    const { item_name, category, brand, quantity } = req.body;
+
+    if (!item_name || !category || !brand || !quantity == null) {
+      return res.status(400).json({ message: 'All fields are required ⚠️' });
     }
 
-    const insertId = await addItem(ITEM_NAME, CATEGORY, BRAND, QUANTITY)
+    const newItem = await createItem(item_name, category, brand, quantity);
 
     res.status(201).json({
-      message: 'Item created successfully!',
-      id: insertId,
-      ITEM_NAME,
-      CATEGORY,
-      BRAND,
-      QUANTITY,
-    })
+      message: 'Item inserted successfully ✅',
+      item: newItem,
+    });
   } catch (error) {
-    console.error('Error adding data', error)
-    res.status(500).json({ message: 'Server error', error: error.message })
+    console.error('Insert error:', error.message);
+    res.status(500).json({ error: 'Server Error' });
   }
-}
+};
 
-export const updatedInventory = async (req, res) => {
-  const { id } = req.params
-  const data = req.body
-
-  if (!data.ITEM_NAME || !data.CATEGORY || !data.BRAND || !data.QUANTITY) {
-    return res.status(400).json({ message: 'All fields are required' })
-  }
-
-  const updatedFields = {
-    ITEM_NAME: data.ITEM_NAME,
-    CATEGORY: data.CATEGORY,
-    BRAND: data.BRAND,
-    QUANTITY: data.QUANTITY,
-  }
+export const update = async (req, res) => {
+  const { id } = req.params;
+  const { item_name, category, brand, quantity } = req.body;
 
   try {
-    const result = await updateItem(id, updatedFields)
-
-    if (result.affectedRows > 0) {
-      return res.status(200).json({ message: 'Item updated successfully' })
-    } else {
-      return res.status(404).json({ message: 'Item not found' })
+    if (!item_name || !category || !brand || !quantity == null) {
+      return res.status(400).json({ message: 'All fields are required ⚠️' });
     }
+
+    const result = await updateItem(id, {
+      item_name,
+      category,
+      brand,
+      quantity,
+    });
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: `Item with ID ${id} not found` });
+    }
+
+    res.status(200).json({
+      message: 'Item updated successfully ✅',
+      updatedItem: { id, item_name, category, brand, quantity },
+    });
   } catch (error) {
-    console.error('Error while updating item', error)
-    res.status(500).json({ message: 'Server error', error: error.message })
+    console.error('Update error:', error.message);
+    res.status(500).json({ error: 'Server error' });
   }
-}
+};
 
 export const removeInventory = async (req, res) => {
-  const { id } = req.params
+  const { id } = req.params;
 
   if (isNaN(id)) {
-    return res.status(400).json({ message: 'Invalid ID' })
+    return res.status(400).json({ message: 'Invalid ID' });
   }
 
   try {
-    await deleteItem({ id: Number(id) })
+    await deleteItem({ id: Number(id) });
 
     // console.log(data)
-    res.status(200).json({ message: 'Item deleted successfully!' })
+    res.status(200).json({ message: 'Item deleted successfully!' });
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: 'Server error', error: error.message })
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
-}
+};
 
 // export const updatedInventory = async (req, res) => {
 //   const { id } = req.params
-//   const { ITEM_NAME, CATEGORY, BRAND, QUANTITY } = req.body
+//   const { item_name, category, brand, quantity } = req.body
 
-//   if (!ITEM_NAME || !CATEGORY || !BRAND || !QUANTITY) {
+//   if (!item_name || !category || !brand || !quantity) {
 //     return res.status(400).json({ message: 'All fields are required.' })
 //   }
 
@@ -125,17 +117,17 @@ export const removeInventory = async (req, res) => {
 // }
 
 // try {
-//   const { ITEM_ID, ITEM_NAME, CATEGORY, BRAND, QUANTITY } = req.body
+//   const { ITEM_ID, item_name, category, brand, quantity } = req.body
 
 //   if (ITEM_ID === null) {
 //     return res.status(400).json({ message: 'ID is required' })
 //   }
 
-//   if (!ITEM_NAME || !CATEGORY || !BRAND || !QUANTITY) {
+//   if (!item_name || !category || !brand || !quantity) {
 //     return res.status(400).json({ message: 'All fields are required.' })
 //   }
 
-//   await update(ITEM_ID, ITEM_NAME, CATEGORY, BRAND, QUANTITY)
+//   await update(ITEM_ID, item_name, category, brand, quantity)
 
 //   res.status(200).json({ message: 'Item updated successfully!' })
 // } catch (error) {

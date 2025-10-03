@@ -1,75 +1,50 @@
-import db from '../config/db.js'
+import db from '../config/db.js';
 
 export const getAllItems = async () => {
-  try {
-    const sql =
-      'SELECT ITEM_ID ,ITEM_NAME, CATEGORY, BRAND, QUANTITY FROM inventory;'
-    const [result] = await db.query(sql)
-    return result
-  } catch (error) {
-    console.error(error)
-  }
-}
+  const sql = `SELECT * FROM inventory;`;
+  const [result] = await db.query(sql);
+  return result;
+};
 
 export const getItemById = async (id) => {
+  const sql = `SELECT id ,item_name, category, brand, quantity FROM inventory WHERE id = ? LIMIT 1;`;
+  const [rows] = await db.query(sql, [id]);
+  return rows;
+};
+
+export const createItem = async (item_name, category, brand, quantity) => {
+  const sql = `INSERT INTO  inventory ( item_name ,  category ,  brand ,  quantity ) VALUES (?, ?, ?, ?);`;
+  const [result] = await db.query(sql, [item_name, category, brand, quantity]);
+
+  return getItemById(result.insertId);
+};
+
+export const updateItem = async (id, updateFields) => {
   try {
-    const sql =
-      'SELECT ITEM_ID ,ITEM_NAME, CATEGORY, BRAND, QUANTITY FROM inventory WHERE ITEM_ID = ? LIMIT 1;'
-    const result = await db.query(sql, [id])
-
-    return result[0]
-  } catch (error) {
-    console.error(error)
-  }
-}
-
-export const addItem = async (ITEM_NAME, CATEGORY, BRAND, QUANTITY) => {
-  try {
-    const sql =
-      'INSERT INTO `inventory`(`ITEM_NAME`, `CATEGORY`, `BRAND`, `QUANTITY`) VALUES (?, ?, ?, ?);'
-    const [result] = await db.query(sql, [ITEM_NAME, CATEGORY, BRAND, QUANTITY])
-
-    return result.insertId
-  } catch (error) {
-    console.error(error)
-    throw error
-  }
-}
-
-export const updateItem = async (
-  ITEM_ID,
-  ITEM_NAME,
-  CATEGORY,
-  BRAND,
-  QUANTITY
-) => {
-  try {
-    const sql =
-      'UPDATE `inventory` SET `ITEM_NAME` = ?, `CATEGORY` = ?, `BRAND` = ?, `QUANTITY` = ? WHERE `ITEM_ID` = ? LIMIT 1;'
+    const sql = `UPDATE inventory SET item_name = ?, category = ?, brand = ?, quantity = ? WHERE id = ? LIMIT 1;`;
     const [result] = await db.query(sql, [
-      ITEM_NAME,
-      CATEGORY,
-      BRAND,
-      QUANTITY,
-      ITEM_ID,
-    ])
+      updateFields.item_name,
+      updateFields.category,
+      updateFields.brand,
+      updateFields.quantity,
+      id,
+    ]);
 
-    console.log(result)
-    return result
+    return result;
   } catch (error) {
-    console.error('Error updating item', error)
-    throw error
+    console.error('Error updating inventory item:', error.message);
+    throw error;
   }
-}
+};
 
 export const deleteItem = async ({ id }) => {
   try {
-    const sql = 'DELETE FROM inventory WHERE ITEM_ID = ?'
-    const [item] = await db.query(sql, id)
+    const sql = `DELETE FROM inventory WHERE id = ?`;
+    const [item] = await db.query(sql, id);
 
-    console.log(item[0])
-    return item[0]
+    console.log(item[0]);
+    return item[0];
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-}
+};
