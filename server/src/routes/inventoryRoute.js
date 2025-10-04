@@ -4,7 +4,7 @@ import {
   fetchById,
   insert,
   update,
-  removeInventory,
+  remove,
 } from '../controllers/inventoryController.js';
 
 const router = Router();
@@ -13,7 +13,7 @@ router.get('/inventory', fetchAll);
 router.get('/inventory/:id', fetchById);
 router.post('/inventory/', insert);
 router.put('/inventory/:id', update);
-router.delete('/inventory/:id', removeInventory);
+router.delete('/inventory/:id', remove);
 // router.get('/inventory/:id', fetchById)
 // router.post('/inventory/', insertInventory)
 // router.patch('/inventory/:id', updatedInventory)

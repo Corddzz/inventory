@@ -82,71 +82,17 @@ export const update = async (req, res) => {
   }
 };
 
-export const removeInventory = async (req, res) => {
-  const { id } = req.params;
-
-  if (isNaN(id)) {
-    return res.status(400).json({ message: 'Invalid ID' });
-  }
-
+export const remove = async (req, res) => {
   try {
-    await deleteItem({ id: Number(id) });
+    const { id } = req.params;
+    const deletedRow = await deleteItem(id);
 
-    // console.log(data)
-    res.status(200).json({ message: 'Item deleted successfully!' });
+    if (deletedRow === 0) {
+      return res.status(404).json({ message: 'Inventory item not found' });
+    }
+    res.status(200).json({ message: 'Item deleted successfully ✅' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('Error deleting inventory item:', error.message);
+    res.status(500).json({ error: 'Server Error' });
   }
 };
-
-// export const updatedInventory = async (req, res) => {
-//   const { id } = req.params
-//   const { item_name, category, brand, quantity } = req.body
-
-//   if (!item_name || !category || !brand || !quantity) {
-//     return res.status(400).json({ message: 'All fields are required.' })
-//   }
-
-//   try {
-//     const getId = await fetchById(id)
-//   } catch (error) {
-//     console.error('Error while updating item', error)
-//     res.status(500).json({ message: 'Server error', error: error.message })
-//   }
-// }
-
-// try {
-//   const { ITEM_ID, item_name, category, brand, quantity } = req.body
-
-//   if (ITEM_ID === null) {
-//     return res.status(400).json({ message: 'ID is required' })
-//   }
-
-//   if (!item_name || !category || !brand || !quantity) {
-//     return res.status(400).json({ message: 'All fields are required.' })
-//   }
-
-//   await update(ITEM_ID, item_name, category, brand, quantity)
-
-//   res.status(200).json({ message: 'Item updated successfully!' })
-// } catch (error) {
-//   console.error('Error updating data', error)
-//   res.status(500).json({ message: 'Server error', error: error.message })
-// }
-
-// export const removeInventory = async (req, res) => {
-//   try {
-//     const { id } = req.params.id
-//     const data = await removeData(id)
-
-//     if (data === 0) {
-//       return res.status(404).json({ message: 'Item not found' })
-//     }
-
-//     return res.status(200).json({ message: 'Item deleted successfully!', id })
-//   } catch (error) {
-//     console.error(error)
-//     res.status(500).json({ message: 'Server error', error: error.message })
-//   }
-// }

@@ -21,8 +21,9 @@ export const createItem = async (item_name, category, brand, quantity) => {
 
 export const updateItem = async (id, updateFields) => {
   try {
-    const sql = `UPDATE inventory SET item_name = ?, category = ?, brand = ?, quantity = ? WHERE id = ? LIMIT 1;`;
-    const [result] = await db.query(sql, [
+    const sql = `UPDATE inventory SET item_name = ?, category = ?, brand = ?, quantity = ? WHERE id = ?;`;
+    const [result] = await db.query([
+      sql,
       updateFields.item_name,
       updateFields.category,
       updateFields.brand,
@@ -37,14 +38,8 @@ export const updateItem = async (id, updateFields) => {
   }
 };
 
-export const deleteItem = async ({ id }) => {
-  try {
-    const sql = `DELETE FROM inventory WHERE id = ?`;
-    const [item] = await db.query(sql, id);
-
-    console.log(item[0]);
-    return item[0];
-  } catch (error) {
-    console.error(error);
-  }
+export const deleteItem = async (id) => {
+  const sql = `DELETE FROM inventory WHERE id = ?`;
+  const [result] = await db.query(sql, [id]);
+  return result.affectedRows;
 };
