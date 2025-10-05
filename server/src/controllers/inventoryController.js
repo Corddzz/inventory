@@ -22,7 +22,7 @@ export const fetchById = async (req, res) => {
     const item = await getItemById(id);
 
     if (!item || item.length === 0) {
-      return res.status(404).json({ message: 'Item not found!' });
+      return res.status(404).json({ message: 'Item not found! ⚠️' });
     }
 
     res.status(200).json(item);
@@ -69,7 +69,9 @@ export const update = async (req, res) => {
     });
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: `Item with ID ${id} not found` });
+      return res
+        .status(404)
+        .json({ message: `Item with ID ${id} not found ⚠️` });
     }
 
     res.status(200).json({
@@ -88,7 +90,7 @@ export const remove = async (req, res) => {
     const deletedRow = await deleteItem(id);
 
     if (deletedRow === 0) {
-      return res.status(404).json({ message: 'Inventory item not found' });
+      return res.status(404).json({ message: 'Inventory item not found ⚠️' });
     }
     res.status(200).json({ message: 'Item deleted successfully ✅' });
   } catch (error) {
