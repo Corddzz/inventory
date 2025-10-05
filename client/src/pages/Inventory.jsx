@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { addItem, fetchItems } from '../api/axios.js';
+import { createItem, fetchItems } from '../api/axios.js';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { Box } from '@mui/material';
 import InputComponent from '../components/InputComponent';
@@ -68,6 +68,7 @@ const Inventory = () => {
     { label: 'Category', value: 'category', align: 'right' },
     { label: 'Brand', value: 'brand', align: 'right' },
     { label: 'Quantity', value: 'quantity', align: 'right' },
+    { label: 'Date', value: 'formatted_date', align: 'center' },
   ];
 
   const handleChange = (e) => {
@@ -81,7 +82,7 @@ const Inventory = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addItem(input);
+      await createItem(input);
       const result = await fetchItems();
       setItems(result);
       handleClose();
@@ -256,7 +257,7 @@ const Inventory = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={tableHeaders.length} align="center">
-                    No inventory found
+                    No inventory found ⚠️
                   </TableCell>
                 </TableRow>
               )}
