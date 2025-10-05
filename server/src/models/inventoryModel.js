@@ -1,7 +1,10 @@
 import db from '../config/db.js';
 
 export const getAllItems = async () => {
-  const sql = `SELECT * FROM inventory;`;
+  const sql = `SELECT id, item_name, category, brand, quantity, 
+       DATE_FORMAT(created_at, '%Y-%m-%d %h:%i:%s %p') AS formatted_date
+  FROM inventory  
+  ORDER BY created_at DESC;`;
   const [result] = await db.query(sql);
   return result;
 };
@@ -22,8 +25,7 @@ export const createItem = async (item_name, category, brand, quantity) => {
 export const updateItem = async (id, updateFields) => {
   try {
     const sql = `UPDATE inventory SET item_name = ?, category = ?, brand = ?, quantity = ? WHERE id = ?;`;
-    const [result] = await db.query([
-      sql,
+    const [result] = await db.query(sql, [
       updateFields.item_name,
       updateFields.category,
       updateFields.brand,
